@@ -1,0 +1,163 @@
+<!doctype html>
+
+<!-- usaquiz.html -->
+<!-- by Chris Peterson -->
+<!-- 5/5/2017 -->
+<!-- Uses JSON, jquery.js, jquery.usmap.js, and raphael.js -->
+
+<html>
+
+<head>
+
+<title>USA State Info Quiz</title>
+
+<!-- Define CSS styles -->
+
+<style>
+h1
+{
+	color: #a8792f;
+}
+
+.tname
+{
+	color: #1174dd;
+	text-align: right;
+	font-weight: bold;
+	font-size: 13pt;
+}
+.tval
+{
+	color: red;
+	text-align: left;
+	background: #e3e4e5;
+	width: 200px;
+}
+
+</style>
+
+<script src="js/jquery.js"></script>
+<script src="js/raphael.js"></script>
+<script src="js/jquery.usmap.js"></script>
+  
+<script>
+$(document).ready(function()
+{
+    $('#map').usmap({});
+});
+
+<!-- Define JSON state info -->
+
+var stinfo =
+{
+   "AL": {"name":"Alabama","flower":"Camellia","capital":"Montgomery","bird":"Yellowhammer","tree":"Longleaf Pine"},
+   "AK": {"name":"Alaska","flower":"Forget Me Not","capital":"Juneau","bird":"Willow Ptarmigan","tree":"Sitka Spruce"},
+   "AZ": {"name":"Arizona","flower":"Saguaro Cactus Blossom","capital":"Phoenix","bird":"Cactus Wren","tree":"Blue Palo Verde"},
+   "AR": {"name":"Arkansas","flower":"Apple Blossom","capital":"Little Rock","bird":"Mockingbird","tree":"Loblolly Pine"},
+   "CA": {"name":"California","flower":"California Poppy","capital":"Sacramento","bird":"California Quail","tree":"Giant Sequoia"},
+   "CO": {"name":"Colorado","flower":"Rocky Mountain Columbine","capital":"Denver","bird":"Lark Bunting","tree":"Colorado Blue Spruce"},
+   "CT": {"name":"Connecticut","flower":"Mountain Laurel","capital":"Hartford","bird":"American Robin","tree":"White Oak"},
+   "DE": {"name":"Delaware","flower":"Peach Blossom","capital":"Dover","bird":"Blue Hen Chicken","tree":"American Holly"},
+   "DC": {"name":"District of Columbia","flower":"American Beauty Rose","capital":"WhiteHouse","bird":"","tree":"Scarlet Oak"},
+   "FL": {"name":"Florida","flower":"Orange Blossom","capital":"Tallahassee","bird":"Mockingbird","tree":"Sabal Palm"},
+   "GA": {"name":"Georgia","flower":"Cherokee Rose","capital":"Atlanta","bird":"Brown Thrasher","tree":"Southern Live Oak"},
+   "HI": {"name":"Hawaii","flower":"Pua Aloalo","capital":"Honolulu","bird":"Nene or Hawaiian Goose","tree":"Candlenut Tree"},
+   "ID": {"name":"Idaho","flower":"Syringa - Mock Orange","capital":"Boise","bird":"Mountain Bluebird","tree":"Western White Pine"},
+   "IL": {"name":"Illinois","flower":"Purple Violet","capital":"Springfield","bird":"Northern Cardinal","tree":"White Oak"},
+   "IN": {"name":"Indiana","flower":"Peony","capital":"Indianapolis","bird":"Cardinal","tree":"Tulip Tree"},
+   "IA": {"name":"Iowa","flower":"Wild Prairie Rose","capital":"Des Moines","bird":"American Goldfinch","tree":"Bur Oak"},
+   "KS": {"name":"Kansas","flower":"Sunflower","capital":"Topeka","bird":"Western Meadowlark","tree":"Cottonwood"},
+   "KY": {"name":"Kentucky","flower":"Goldenrod","capital":"Frankfort","bird":"Cardinal","tree":"Tulip-tree"},
+   "LA": {"name":"Lousiana","flower":"Magnolia","capital":"Baton Rouge","bird":"Brown Pelican","tree":"Bald Cypress"},
+   "ME": {"name":"Maine","flower":"White pine cone and tassel","capital":"Augusta","bird":"Black-Capped Chickadee","tree":"Eastern White Pine"},
+   "MD": {"name":"Maryland","flower":"Black-eyed susan","capital":"Annapolis","bird":"Baltimore Oriole","tree":"White Oak"},
+   "MA": {"name":"Massachusetts","flower":"Trailing-Arbutus","capital":"Boston","bird":"Black-Capped Chickadee","tree":"American Elm"},
+   "MI": {"name":"Michigan","flower":"Apple Blossom","capital":"Lansing","bird":"American Robin","tree":"Eastern White Pine"},
+   "MN": {"name":"Minnesota","flower":"Pink and white lady's-slipper","capital":"St. Paul","bird":"Common Loon","tree":"Red Pine"},
+   "MS": {"name":"Mississippi","flower":"Magnolia","capital":"Jackson","bird":"Mockingbird","tree":"Southern Magnolia"},
+   "MO": {"name":"Missouri","flower":"Hawthorn","capital":"Jefferson City","bird":"Eastern Bluebird","tree":"Flowering Dogwood"},
+   "MT": {"name":"Montana","flower":"Bitterroot","capital":"Helena","bird":"Western Meadowlark","tree":"Ponderosa Pine"},
+   "NE": {"name":"Nebraska","flower":"Goldenrod","capital":"Lincoln","bird":"Western Meadowlark","tree":"Eastern Cottonwood"},
+   "NV": {"name":"Nevada","flower":"Sagebrush","capital":"Carson City","bird":"Mountain Bluebird","tree":"Great Basin Bristlecone pine"},
+   "NH": {"name":"New Hampshire","flower":"Purple lilac","capital":"Concord","bird":"Purple Finch","tree":"American White Birch"},
+   "NJ": {"name":"New Jersey","flower":"Violet","capital":"Trenton","bird":"Eastern Goldfinch","tree":"Northern Red Oak"},
+   "NM": {"name":"New Mexico","flower":"Yucca flower","capital":"Santa Fe","bird":"Roadrunner","tree":"Piñon Pine"},
+   "NY": {"name":"New York","flower":"Rose","capital":"Albany","bird":"Eastern Bluebird","tree":"Sugar Maple"},
+   "NC": {"name":"North Carolina","flower":"American Dogwood","capital":"Raleigh","bird":"Cardinal","tree":"Pine"},
+   "ND": {"name":"North Dakota","flower":"Wild Prairie Rose","capital":"Bismarck","bird":"Western Meadowlark","tree":"American Elm"},
+   "OH": {"name":"Ohio","flower":"Scarlet Carnation","capital":"Columbus","bird":"Cardinal","tree":"Ohio Buckeye"},
+   "OK": {"name":"Oklahoma","flower":"Mistletoe","capital":"Oklahoma City","bird":"Scissor-Tailed Flycatcher","tree":"Eastern Redbud"},
+   "OR": {"name":"Oregon","flower":"Oregon Grape","capital":"Salem","bird":"Western Meadowlark","tree":"Douglas-fir"},
+   "PA": {"name":"Pennsylvania","flower":"Mountain Laurel","capital":"Harrisburg","bird":"Ruffed Grouse","tree":"Eastern Hemlock"},
+   "RI": {"name":"Rhode Island","flower":"Violet","capital":"Providence","bird":"Rhode Island Red","tree":"Red Maple"},
+   "SC": {"name":"South Carolina","flower":"Yellow Jessamine","capital":"Columbia","bird":"Carolina Wren","tree":"Sabal Palm"},
+   "SD": {"name":"South Dakota","flower":"Pasque Flower","capital":"Pierre","bird":"Ring Necked Pheasant","tree":"Black Hills Spruce"},
+   "TN": {"name":"Tennessee","flower":"Iris","capital":"Nashville","bird":"Mockingbird","tree":"Tulip-tree"},
+   "TX": {"name":"Texas","flower":"Bluebonnet","capital":"Austin","bird":"Mockingbird","tree":"Pecan"},
+   "UT": {"name":"Utah","flower":"Sego lily","capital":"Salt Lake City","bird":"California Gull","tree":"Quaking Aspen"},
+   "VT": {"name":"Vermont","flower":"Red Clover","capital":"Montpelier","bird":"Hermit Thrush","tree":"Sugar Maple"},
+   "VA": {"name":"Virginia","flower":"American Dogwood","capital":"Richmond","bird":"Cardinal","tree":"Flowering dogwood"},
+   "WA": {"name":"Washington","flower":"Coast Rhododendron","capital":"Olympia","bird":"American Goldfinch","tree":"Western Hemlock"},
+   "WV": {"name":"West Virginia","flower":"Rhododendron","capital":"Charleston","bird":"Cardinal","tree":"Sugar Maple"},
+   "WI": {"name":"Wisconsin","flower":"Wood Violet","capital":"Madison","bird":"American Robin","tree":"Sugar Maple"},
+   "WY": {"name":"Wyoming","flower":"Indian Paintbrush","capital":"Cheyenne","bird":"Meadowlark","tree":"Plains Cottonwood"}
+};
+
+</script>
+
+</head>
+
+<body>
+
+<div id="header" style="margin:auto;">
+<center>
+<h1>USA State Facts</h1>
+<p>
+(click on a state for info)
+<table>
+<tr><td class="tname">State:</td><td class="tval" id="statename"></td></tr>
+<tr><td class="tname">Abbr:</td><td class="tval" id="stateabbr"></td></tr>
+<tr><td class="tname">Capital:</td><td class="tval" id="statecap"></td></tr>
+<tr><td class="tname">State Bird:</td><td class="tval" id="statebird"></td></tr>
+<tr><td class="tname">State Flower:</td><td class="tval" id="stateflower"></td></tr>
+<tr><td class="tname">State Tree:</td><td class="tval" id="statetree"></td></tr>
+</table>
+<center>
+</div>
+
+<div id="map" style="width: 800px; height: 700px;margin:auto"></div>
+
+<script>
+$('#map').usmap({
+  click: function(event, data)
+  {
+     showStateInfo(data.name);
+  }
+});
+
+//  Get the state info and display it using jquery assignments
+
+function showStateInfo(stateabbr)
+{
+   try
+   {
+      var st = stinfo[stateabbr];
+      $("#statename").html(st.name);
+      $("#stateabbr").html(stateabbr);
+      $("#stateflower").html(st.flower);
+      $("#statecap").html(st.capital);
+      $("#statebird").html(st.bird);
+      $("#statetree").html(st.tree);
+   }
+   catch (err)
+   {
+      alert("Invalid State - " + stateabbr);
+   }
+}
+
+</script>
+
+</body>
+
+</html>
+
